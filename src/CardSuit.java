@@ -3,9 +3,7 @@ public enum CardSuit {
 	spades("Spades"),
 	diamonds("Diamond"),
 	clubs("Club");
-
 	private  final String suit;
-
 	private CardSuit(String name) {
         this.suit = name;
     }
