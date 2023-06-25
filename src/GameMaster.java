@@ -1,19 +1,19 @@
 import java.util.ArrayList;
 
 public class GameMaster {
-	ArrayList<Card> deck = new ArrayList<Card>();
+	static ArrayList<Card> deck = new ArrayList<Card>();
 	private int numberOfPlayers = 0;
 	ArrayList<Player> players = new ArrayList<Player>();
 	private Player whoseTurn;
 
-	public void newGame(int numberOfPlayers, String[] playerNames) {
+	public GameMaster(int numberOfPlayers, String[] playerNames) {
 		this.numberOfPlayers = numberOfPlayers;
 		for (String player : playerNames) {
 			createPlayer(player);
 		}
 		newDeck();
 		whoseTurn = players.get(0);
-	}// end of newGame
+	}// end of GameMaster
 
 	private void newDeck() {
 		deck.clear();
@@ -26,15 +26,29 @@ public class GameMaster {
 		}
 	}// end of newDeck
 
-	public void createPlayer(String playerName) {
+	private void createPlayer(String playerName) {
 		players.add(new Player(playerName));
 	}// end of getPlayer
 
 	public int getNumberOfPlayers() {
 		return numberOfPlayers;
-	}
+	}// end of getNumberOfPlayers
 
-	public Player getTheirTurn() {
+	public String getWhoseTurnAsName() {
+		return whoseTurn.getName();
+	}// end of getWhoseTurnAsName
+
+	public Player getWhoseTurn() {
 		return whoseTurn;
+	}// end of getWhoseTurn
+
+	public static ArrayList<Card> takeFromDeck(int amount){
+		ArrayList<Card> cardsToRemove = new ArrayList<Card>();
+		for (int i = 0; i < amount; i++) {
+			int cardToRemove = (int)(Math.random()*deck.size());
+            cardsToRemove.add(deck.get(cardToRemove));
+			deck.remove(cardToRemove);
+        }
+		return cardsToRemove;
 	}
 }
