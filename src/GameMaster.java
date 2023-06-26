@@ -1,27 +1,28 @@
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class GameMaster {
-    private static ArrayList<Card> deck = new ArrayList<Card>();
-    private int numberOfPlayers = 0;
-    private ArrayList<Player> players = new ArrayList<Player>();
+    private List<Card> deck = new ArrayList<>();
+    private List<Player> players = new ArrayList<>();
     private Player whoseTurn;
-    private int whoseTurnNumber = 0;
 
-    public GameMaster(int numberOfPlayers, String[] playerNames) {
-        this.numberOfPlayers = numberOfPlayers;
-        newDeck();
-        for (String player : playerNames) {
-            createPlayer(player);
+    public GameMaster(String[] playerNames) {
+        for (String playerName : playerNames) {
+            createPlayer(playerName);
         }
+        newDeck();
         whoseTurn = players.get(0);
     }
 
     private void newDeck() {
         deck.clear();
-        deck.add(new Card(CardValue.TWO, CardSuit.clubs));
+        deck.add(new Card(CardValue.TWO, CardSuit.CLUBS));
         for (CardSuit suit : CardSuit.values()) {
-            for (CardValue value : CardValue.values()) {
-                deck.add(new Card(value, suit));
+            if (suit != CardSuit.CLUBS) { // Skip adding TWO of CLUBS again
+                for (CardValue value : CardValue.values()) {
+                    deck.add(new Card(value, suit));
+                }
             }
         }
     }
@@ -31,7 +32,7 @@ public class GameMaster {
     }
 
     public int getNumberOfPlayers() {
-        return numberOfPlayers;
+        return players.size();
     }
 
     public String getWhoseTurnAsName() {
@@ -42,72 +43,84 @@ public class GameMaster {
         return whoseTurn;
     }
 
-    public static ArrayList<Card> takeFromCardsDeck(int amount) {
-        ArrayList<Card> cardsToRemove = new ArrayList<Card>();
+    public List<Card> takeFromDeck(int amount) {
+        List<Card> cardsToRemove = new ArrayList<>();
+        Random random = new Random();
         for (int i = 0; i < amount; i++) {
-            int cardToRemove = (int) (Math.random() * deck.size());
-            cardsToRemove.add(deck.get(cardToRemove));
-            deck.remove(cardToRemove);
+            int cardToRemoveIndex = random.nextInt(deck.size());
+            cardsToRemove.add(deck.get(cardToRemoveIndex));
+            deck.remove(cardToRemoveIndex);
         }
         return cardsToRemove;
     }
 
     public String getPlayerNames() {
-        String playerNames = "";
-        int whatPlayer = 1;
+        StringBuilder playerNames = new StringBuilder();
+        int playerIndex = 1;
         for (Player player : players) {
-            if (!player.getName().equals(getWhoseTurnAsName())) {
-                playerNames += whatPlayer + ": " + player.getName() + " \n";
+            if (!player.equals(whoseTurn)) {
+                playerNames.append(playerIndex).append(": ").append(player.getName()).append("\n");
             }
-            whatPlayer++;
+            playerIndex++;
         }
-        return playerNames;
+        return playerNames.toString();
     }
 
-    public Boolean isPlayerGuessCorrect(String playerPick, String valuePick) {
+    public boolean isPlayerGuessCorrect(String playerPick, String valuePick) {
         int valuePicked = cardValuePickToInt(valuePick);
-        Player askedPlayer = null;
-        Player guessingPlayer = null;
-
-        for (Player player : players) {
-            if (player.getName().equals(playerPick)) {
-                askedPlayer = player;
-            } else if (player.getName().equals(getWhoseTurnAsName())) {
-                guessingPlayer = player;
-            }
-        }
+        Player askedPlayer = getPlayerByName(playerPick);
+        Player guessingPlayer = whoseTurn;
 
         if (askedPlayer != null && guessingPlayer != null) {
-            ArrayList<Card> askedPlayerHand = askedPlayer.getHand();
+            List<Card> askedPlayerHand = askedPlayer.getHand();
+            List<Card> matchingCards = new ArrayList<>();
             for (Card cardInHand : askedPlayerHand) {
                 if (cardInHand.getValue() == valuePicked) {
-                    // Remove card from asked player's hand
-                    askedPlayerHand.remove(cardInHand);
-                    // Add card to guessing player's hand
-                    guessingPlayer.addToHand(cardInHand);
-                    return true;
+                    matchingCards.add(cardInHand);
                 }
             }
-        }
 
+            if (!matchingCards.isEmpty()) {
+                // Remove matching cards from asked player's hand
+                askedPlayerHand.removeAll(matchingCards);
+                // Add matching cards to guessing player's hand
+                guessingPlayer.addToHand(matchingCards);
+                // Check if the player has four cards of the same value
+                if (guessingPlayer.checkForBooks()) {
+                    List<Card> books = guessingPlayer.getBooks();
+                    guessingPlayer.removeFromHand(books);
+                    guessingPlayer.addToBooks(books);
+                }
+                return true;
+            }
+        }
         return false;
     }
 
+    private Player getPlayerByName(String playerName) {
+        for (Player player : players) {
+            if (player.getName().equals(playerName)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     public String printCardValues() {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         int i = 2;
         for (CardValue value : CardValue.values()) {
-            output += i + ": " + value.toString() + "\n";
+            output.append(i).append(": ").append(value).append("\n");
             i++;
         }
-        return output;
+        return output.toString();
     }
 
     private int cardValuePickToInt(String value) {
         try {
             return Integer.parseInt(value);
-        } catch (Exception e) {
-            switch (value) {
+        } catch (NumberFormatException e) {
+            switch (value.toUpperCase()) {
                 case "ACE":
                     return 14;
                 case "KING":
@@ -122,29 +135,14 @@ public class GameMaster {
         }
     }
 
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
-
     public void nextTurn() {
-        if (whoseTurnNumber < players.size() - 1) {
-            whoseTurnNumber++;
-            whoseTurn = players.get(whoseTurnNumber);
-        } else {
-            whoseTurnNumber = 0;
-            whoseTurn = players.get(whoseTurnNumber);
-        }
+        int currentIndex = players.indexOf(whoseTurn);
+        int nextIndex = (currentIndex + 1) % players.size();
+        whoseTurn = players.get(nextIndex);
     }
 
     public boolean isGameOver() {
-        int totalBooks = 0;
-        for (Player book : players) {
-            totalBooks += book.getNumberOfBooks();
-        }
-        if (deck.size() == 0 && totalBooks == 13) {
-            return true;
-        } else {
-            return false;
-        }
+        int totalBooks = players.stream().mapToInt(Player::getNumberOfBooks).sum();
+        return deck.isEmpty() && totalBooks == 13;
     }
 }
