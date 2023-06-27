@@ -7,32 +7,56 @@ public class Player {
 	private int numberOfBooks = 0;
 	private ArrayList<Card> books = new ArrayList<Card>();
 
-	Player(String name){
+	Player(String name) {
 		this.name = name;
-		hand = GameMaster.takeFromDeck(5);
-	}//end of player
-
+		hand = GameMaster.takeFromCardsDeck(5);
+	}
 
 	public ArrayList<Card> getHand() {
 		return this.hand;
-	}//end of getHand
+	}
 
 	public void setHand(ArrayList<Card> hand) {
 		this.hand = hand;
-	}//end of setHand
+	}
 
 	public String getName() {
 		return name;
-	}//end of getName
+	}
+
 	public void setName(String name) {
 		this.name = name;
-	}//end of setName
+	}
 
 	public int getNumberOfBooks() {
 		return numberOfBooks;
-	}//end of getNumberOfBooks
-	public void setNumberOfBooks(int numberOfBooks) {
-        this.numberOfBooks = numberOfBooks;
-    }//end of setNumberOfBooks
+	}
 
+	public void setNumberOfBooks(int numberOfBooks) {
+		this.numberOfBooks = numberOfBooks;
+	}
+
+	public ArrayList<Card> TakeFromHand() {
+		ArrayList<Card> cardsToTake = new ArrayList<Card>();
+
+		return cardsToTake;
+	}
+
+	public void addToHand(ArrayList<Card> drawnCards) {
+		for (Card card : drawnCards) {
+			hand.add(card);
+		}
+	}
+
+	public ArrayList<Card> getBooks() {
+		return books;
+	}
+
+	public void addToBooks(ArrayList<Card> bookToAdd) {
+
+	}
+
+	public void takeFromHand(Card matchingCard) {
+
+	}
 }
