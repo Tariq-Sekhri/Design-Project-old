@@ -42,7 +42,7 @@ public class GameMaster {
         return whoseTurn;
     }
 
-    public static ArrayList<Card> takeFromCardsDeck(int amount) {
+    public static ArrayList<Card> takeFromDeck(int amount) {
         ArrayList<Card> cardsToRemove = new ArrayList<Card>();
         for (int i = 0; i < amount; i++) {
             int cardToRemove = (int) (Math.random() * deck.size());
@@ -93,7 +93,7 @@ public class GameMaster {
                 }
                 return true;
             } else {
-                ArrayList<Card> drawnCards = takeFromCardsDeck(1);
+                ArrayList<Card> drawnCards = takeFromDeck(1);
                 whoseTurn.addToHand(drawnCards);
 
                 for (Card drawnCard : drawnCards) {
@@ -153,8 +153,8 @@ public class GameMaster {
 
     public boolean isGameOver() {
         int totalBooks = 0;
-        for (Player book : players) {
-            totalBooks += book.getNumberOfBooks();
+        for (Player player : players) {
+            totalBooks += player.getNumberOfBooks();
         }
         if (deck.size() == 0 && totalBooks == 13) {
             return true;
@@ -162,4 +162,8 @@ public class GameMaster {
             return false;
         }
     }
+
+	public static ArrayList<Card> takeFromCardsDeck(int i) {
+		return null;
+	}
 }
