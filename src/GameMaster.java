@@ -51,7 +51,7 @@ public class GameMaster {
 		return whoseTurn;
 	}// end of getWhoseTurn
 
-	public static ArrayList<Card> takeCardsFromDeck(int amount) {
+	public ArrayList<Card> takeCardsFromDeck(int amount) {
 		ArrayList<Card> cardsToRemove = new ArrayList<Card>();
 		for (int i = 0; i < amount || !deck.isEmpty(); i++) {
 			int cardToRemove = (int) (Math.random() * deck.size());
