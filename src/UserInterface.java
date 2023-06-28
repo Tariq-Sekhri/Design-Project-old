@@ -1,153 +1,108 @@
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.Scanner;
 
-public class GameMaster {
-    private List<Card> deck = new ArrayList<>();
-    private List<Player> players = new ArrayList<>();
-    private Player whoseTurn;
+public class UserInterface {
+    // user interface is what the players will use to play the game.
+    // it will call methods from game master for the game logic
+    private static Scanner userInput = new Scanner(System.in);
 
-    public GameMaster(String[] playerNames) {
-        for (String playerName : playerNames) {
-            createPlayer(playerName);
-        }
-        newDeck();
-        whoseTurn = players.get(0);
-    }
-
-    private void newDeck() {
-        deck.clear();
-        deck.add(new Card(CardValue.TWO, CardSuit.CLUBS));
-        for (CardSuit suit : CardSuit.values()) {
-            if (suit != CardSuit.CLUBS) { // Skip adding TWO of CLUBS again
-                for (CardValue value : CardValue.values()) {
-                    deck.add(new Card(value, suit));
+    public static void main(String[] args) {
+        boolean playAgain = false;
+        do {
+            /* starting a new game */
+            welcome();
+            int numberOfPlayer = getNumberOfPlayers();
+            String[] PlayerNames = getPlayerNames(numberOfPlayer);
+            GameMaster game = new GameMaster(PlayerNames);
+            do {
+                String playerPick = playerPick(game);
+                String valuePick = valuePick(game).toUpperCase();
+                boolean isCorrect = game.isPlayerGuessCorrect(playerPick, valuePick);
+                if (!isCorrect) {
+                    System.out.println("You got it wrong! next player turn");
+                    game.nextTurn();
+                } else {
+                    System.out.println("you got it right! so you can go again!");
                 }
-            }
+            } while (!game.isGameOver());// emd of game
+            System.out.println("would you like to play again? enter yes if so");
+            playAgain = doTheyWantToPlayerAgain(userInput.nextLine());
+        } while (playAgain);
+    }// end of main
+
+    private static String[] getPlayerNames(int numberOfPlayer) {
+        String[] PlayerNames = new String[numberOfPlayer];
+        System.out.println("please enter the name of the first player");
+        PlayerNames[0] = userInput.nextLine();
+        for (int i = 1; i < numberOfPlayer; i++) {
+            System.out.println("please enter the name of player " + (i + 1));
+            PlayerNames[i] = userInput.nextLine();
         }
-    }
+        return PlayerNames;
+    }// end of getPlayerNames
 
-    private void createPlayer(String playerName) {
-        players.add(new Player(playerName));
-    }
-
-    public int getNumberOfPlayers() {
-        return players.size();
-    }
-
-    public String getWhoseTurnAsName() {
-        return whoseTurn.getName();
-    }
-
-    public Player getWhoseTurn() {
-        return whoseTurn;
-    }
-
-    public List<Card> takeFromDeck(int amount) {
-        List<Card> cardsToRemove = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < amount; i++) {
-            int cardToRemoveIndex = random.nextInt(deck.size());
-            cardsToRemove.add(deck.get(cardToRemoveIndex));
-            deck.remove(cardToRemoveIndex);
+    private static String valuePick(GameMaster game) {
+        if (game.getWhoseTurn().getHand().size() <= 0) {
+            game.getWhoseTurn().addToHand(game.takeCardsFromDeck(5));
         }
-        return cardsToRemove;
-    }
-
-    public String getPlayerNames() {
-        StringBuilder playerNames = new StringBuilder();
-        int playerIndex = 1;
-        for (Player player : players) {
-            if (!player.equals(whoseTurn)) {
-                playerNames.append(playerIndex).append(": ").append(player.getName()).append("\n");
-            }
-            playerIndex++;
+        System.out.println("please enter the value of the card you would like");
+        for (String card : game.getWhoseTurn().handToString()) {
+            System.out.println(card);
         }
-        return playerNames.toString();
-    }
+        return userInput.nextLine();
+    }// end of getPlayerNames
 
-    public boolean isPlayerGuessCorrect(String playerPick, String valuePick) {
-        int valuePicked = cardValuePickToInt(valuePick);
-        Player askedPlayer = getPlayerByName(playerPick);
-        Player guessingPlayer = whoseTurn;
+    private static String playerPick(GameMaster game) {
+        System.out.println("its " + game.getWhoseTurnAsName() + " turn");
+        System.out.println("please enter the name of the player you would like to ask");
+        System.out.println("or the number of the player you would like to");
+        System.out.println(game.getPlayerNames() + "*************");
+        String playerPick = userInput.nextLine();
+        try {
+            int playerPicked = Integer.parseInt(playerPick);
+            ArrayList<Player> players = game.getPlayers();
+            return players.get(playerPicked - 1).getName();
 
-        if (askedPlayer != null && guessingPlayer != null) {
-            List<Card> askedPlayerHand = askedPlayer.getHand();
-            List<Card> matchingCards = new ArrayList<>();
-            for (Card cardInHand : askedPlayerHand) {
-                if (cardInHand.getValue() == valuePicked) {
-                    matchingCards.add(cardInHand);
+        } catch (Exception e) {
+            return playerPick;
+        }
+
+    }// end of playerPick
+
+    private static void welcome() {
+        String rules = "nothing yet";
+        System.out.println("hello and welcome to go fish");
+        System.out.println("here are the rules" + rules);
+        System.out.println("please enter the number of players");
+    }// end of welcome
+
+    private static int getNumberOfPlayers() {
+
+        do {
+            try {
+                int playerAmount = Integer.parseInt(userInput.nextLine());
+                if (playerAmount > 10) {
+                    System.out.println("their is a max of 10 players please enter a number less than 10");
+
+                } else if (playerAmount > 0) {
+                    return playerAmount;
+                } else {
+
+                    System.out.println("please enter a number greater than zero");
                 }
-            }
+            } catch (Exception e) {
+                System.out.println("please enter a number");
 
-            if (!matchingCards.isEmpty()) {
-                // Remove matching cards from asked player's hand
-                askedPlayerHand.removeAll(matchingCards);
-                // Add matching cards to guessing player's hand
-                guessingPlayer.addToHand(matchingCards);
-                // Add matching cards to guessing player's books
-                guessingPlayer.addToBooks(matchingCards);
-                // Increment the number of books for the guessing player
-                guessingPlayer.incrementNumberOfBooks();
-                return true;
             }
+        } while (true);
+
+    }// end of getNumberOfPlayers
+
+    private static boolean doTheyWantToPlayerAgain(String playAgain) {
+        if (playAgain.equalsIgnoreCase("yes") || playAgain.equalsIgnoreCase("y") || playAgain.equalsIgnoreCase("ya")
+                || playAgain.equalsIgnoreCase("yep") || playAgain.equalsIgnoreCase("1")) {
+            return true;
         }
         return false;
-    }
-
-    private Player getPlayerByName(String playerName) {
-        for (Player player : players) {
-            if (player.getName().equals(playerName)) {
-                return player;
-            }
-        }
-        return null;
-    }
-
-    public String printCardValues() {
-        StringBuilder output = new StringBuilder();
-        int i = 2;
-        for (CardValue value : CardValue.values()) {
-            output.append(i).append(": ").append(value.toString()).append("\n");
-            i++;
-        }
-        return output.toString();
-    }
-
-    private int cardValuePickToInt(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            switch (value.toUpperCase()) {
-                case "ACE":
-                    return 14;
-                case "KING":
-                    return 13;
-                case "QUEEN":
-                    return 12;
-                case "JACK":
-                    return 11;
-                default:
-                    return -100;
-            }
-        }
-    }
-
-    public List<Player> getPlayers() {
-        return players;
-    }
-
-    public void nextTurn() {
-        int currentIndex = players.indexOf(whoseTurn);
-        int nextIndex = (currentIndex + 1) % players.size();
-        whoseTurn = players.get(nextIndex);
-    }
-
-    public boolean isGameOver() {
-        int totalBooks = 0;
-        for (Player player : players) {
-            totalBooks += player.getNumberOfBooks();
-        }
-        return deck.isEmpty() && totalBooks == 13;
-    }
-}
+    }// end of doTheyWantToPlayerAgain
+}// end of UserInterface
