@@ -2,32 +2,32 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class UserInterface {
-    
+    // user interface is what the players will use to play the game.
+    // it will call methods from game master for the game logic
     private static Scanner userInput = new Scanner(System.in);
 
     public static void main(String[] args) {
         boolean playAgain = false;
         do {
             /* starting a new game */
-            playAgain = false;
-            boolean isGameOver = false;
             welcome();
             int numberOfPlayer = getNumberOfPlayers();
             String[] PlayerNames = getPlayerNames(numberOfPlayer);
-            GameMaster game = new GameMaster(numberOfPlayer, PlayerNames);
-
+            GameMaster game = new GameMaster(PlayerNames);
             do {
                 String playerPick = playerPick(game);
                 String valuePick = valuePick(game).toUpperCase();
                 boolean isCorrect = game.isPlayerGuessCorrect(playerPick, valuePick);
                 if (!isCorrect) {
+                    System.out.println("You got it wrong! next player turn");
                     game.nextTurn();
+                } else {
+                    System.out.println("you got it right! so you can go again!");
                 }
-               isGameOver =  game.isGameOver();
-            } while (!isGameOver);// emd of game
+            } while (!game.isGameOver());// emd of game
             System.out.println("would you like to play again? enter yes if so");
             playAgain = doTheyWantToPlayerAgain(userInput.nextLine());
-        } while (playAgain);// end of program
+        } while (playAgain);
     }// end of main
 
     private static String[] getPlayerNames(int numberOfPlayer) {
@@ -42,11 +42,15 @@ public class UserInterface {
     }// end of getPlayerNames
 
     private static String valuePick(GameMaster game) {
+        if (game.getWhoseTurn().getHand().size() <= 0) {
+            game.getWhoseTurn().addToHand(game.takeCardsFromDeck(5));
+        }
         System.out.println("please enter the value of the card you would like");
-        System.out.println(game.printCardValues());
-
+        for (String card : game.getWhoseTurn().handToString()) {
+            System.out.println(card);
+        }
         return userInput.nextLine();
-    }//end of getPlayerNames
+    }// end of getPlayerNames
 
     private static String playerPick(GameMaster game) {
         System.out.println("its " + game.getWhoseTurnAsName() + " turn");
@@ -63,21 +67,24 @@ public class UserInterface {
             return playerPick;
         }
 
-    }//end of playerPick
+    }// end of playerPick
 
     private static void welcome() {
         String rules = "nothing yet";
         System.out.println("hello and welcome to go fish");
         System.out.println("here are the rules" + rules);
         System.out.println("please enter the number of players");
-    }//end of welcome
+    }// end of welcome
 
     private static int getNumberOfPlayers() {
         boolean anyErrors = false;
         do {
             try {
                 int playerAmount = Integer.parseInt(userInput.nextLine());
-                if (playerAmount > 0) {
+                if (playerAmount > 10) {
+                    System.out.println("their is a max of 10 players please enter a number less than 10");
+                    anyErrors = true;
+                } else if (playerAmount > 0) {
                     return playerAmount;
                 } else {
                     anyErrors = true;
@@ -89,7 +96,7 @@ public class UserInterface {
             }
         } while (anyErrors);
         return -100;
-    }//end of getNumberOfPlayers
+    }// end of getNumberOfPlayers
 
     private static boolean doTheyWantToPlayerAgain(String playAgain) {
         if (playAgain.equalsIgnoreCase("yes") || playAgain.equalsIgnoreCase("y") || playAgain.equalsIgnoreCase("ya")
@@ -97,5 +104,5 @@ public class UserInterface {
             return true;
         }
         return false;
-    }//end of doTheyWantToPlayerAgain
-}//end of UserInterface
+    }// end of doTheyWantToPlayerAgain
+}// end of UserInterface
