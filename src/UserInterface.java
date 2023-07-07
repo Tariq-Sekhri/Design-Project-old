@@ -42,9 +42,7 @@ public class UserInterface {
     }// end of getPlayerNames
 
     private static String valuePick(GameMaster game) {
-        if (game.getWhoseTurn().getHand().size() <= 0) {
-            game.getWhoseTurn().addToHand(game.takeCardsFromDeck(5));
-        }
+        
         System.out.println("please enter the value of the card you would like");
         for (String card : game.getWhoseTurn().handToString()) {
             System.out.println(card);
