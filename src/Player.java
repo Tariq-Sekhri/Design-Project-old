@@ -10,7 +10,7 @@ public class Player {
 
 	Player(String name,ArrayList<Card> hand) {
 		this.name = name;
-		hand = this.hand;
+		this.hand = hand;
 	}// end of player
 
 	public ArrayList<Card> getHand() {

@@ -25,7 +25,7 @@ public class Deck {
 
     public ArrayList<Card> takeCardsFromDeck(int amount) {
 		ArrayList<Card> cardsToRemove = new ArrayList<Card>();
-		for (int i = 0; i < amount || !deck.isEmpty(); i++) {
+		for (int i = 0; i < amount && !deck.isEmpty(); i++) {
 			int cardToRemove = (int) (Math.random() * deck.size());
 			cardsToRemove.add(deck.get(cardToRemove));
 			deck.remove(cardToRemove);

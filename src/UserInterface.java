@@ -79,7 +79,7 @@ public class UserInterface {
         do {
             try {
                 int playerAmount = Integer.parseInt(userInput.nextLine());
-                if (playerAmount > 10) {
+                if (playerAmount > 6) {
                     System.out.println("their is a max of 10 players please enter a number less than 10");
                     anyErrors = true;
                 } else if (playerAmount > 0) {
