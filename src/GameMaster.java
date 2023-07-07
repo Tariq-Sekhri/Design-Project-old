@@ -33,6 +33,7 @@ public class GameMaster {
 		return whoseTurn;
 	}// end of getWhoseTurn
 
+
 	public void handEmpty() {
 		if (getWhoseTurn().getHand().size() <= 0) {
 			getWhoseTurn().addToHand(deck.takeCardsFromDeck(5));

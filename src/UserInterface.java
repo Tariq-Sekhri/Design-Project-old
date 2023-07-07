@@ -75,25 +75,25 @@ public class UserInterface {
     }// end of welcome
 
     private static int getNumberOfPlayers() {
-        boolean anyErrors = false;
+
         do {
             try {
                 int playerAmount = Integer.parseInt(userInput.nextLine());
                 if (playerAmount > 10) {
                     System.out.println("their is a max of 10 players please enter a number less than 10");
-                    anyErrors = true;
+
                 } else if (playerAmount > 0) {
                     return playerAmount;
                 } else {
-                    anyErrors = true;
+
                     System.out.println("please enter a number greater than zero");
                 }
             } catch (Exception e) {
                 System.out.println("please enter a number");
-                anyErrors = true;
+
             }
-        } while (anyErrors);
-        return -100;
+        } while (true);
+
     }// end of getNumberOfPlayers
 
     private static boolean doTheyWantToPlayerAgain(String playAgain) {
