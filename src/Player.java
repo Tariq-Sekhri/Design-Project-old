@@ -8,9 +8,9 @@ public class Player {
 	private int numberOfBooks = 0;
 	private ArrayList<Card> books = new ArrayList<Card>();
 
-	Player(String name) {
+	Player(String name,ArrayList<Card> hand) {
 		this.name = name;
-		hand = GameMaster.takeCardsFromDeck(5);
+		hand = this.hand;
 	}// end of player
 
 	public ArrayList<Card> getHand() {

@@ -42,9 +42,7 @@ public class UserInterface {
     }// end of getPlayerNames
 
     private static String valuePick(GameMaster game) {
-        if (game.getWhoseTurn().getHand().size() <= 0) {
-            game.getWhoseTurn().addToHand(game.takeCardsFromDeck(5));
-        }
+        
         System.out.println("please enter the value of the card you would like");
         for (String card : game.getWhoseTurn().handToString()) {
             System.out.println(card);
@@ -77,25 +75,25 @@ public class UserInterface {
     }// end of welcome
 
     private static int getNumberOfPlayers() {
-
+        boolean anyErrors = false;
         do {
             try {
                 int playerAmount = Integer.parseInt(userInput.nextLine());
                 if (playerAmount > 10) {
                     System.out.println("their is a max of 10 players please enter a number less than 10");
-
+                    anyErrors = true;
                 } else if (playerAmount > 0) {
                     return playerAmount;
                 } else {
-
+                    anyErrors = true;
                     System.out.println("please enter a number greater than zero");
                 }
             } catch (Exception e) {
                 System.out.println("please enter a number");
-
+                anyErrors = true;
             }
-        } while (true);
-
+        } while (anyErrors);
+        return -100;
     }// end of getNumberOfPlayers
 
     private static boolean doTheyWantToPlayerAgain(String playAgain) {
