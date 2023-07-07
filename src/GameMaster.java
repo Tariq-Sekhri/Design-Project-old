@@ -1,24 +1,42 @@
 import java.util.ArrayList;
 
 public class GameMaster {
-
 	// game master hold information about the game as well as the logic of the game;
-	private Deck deck = new Deck();
+	private static ArrayList<Card> deck = new ArrayList<Card>();
 	private ArrayList<Player> players = new ArrayList<Player>();
 	private Player whoseTurn;
 	private int whoseTurnNumber = 0;
 
 	public GameMaster(String[] playerNames) {
-		int cardsPerPlayer;
-		cardsPerPlayer = (playerNames.length<4) ? 7:  5;
+		deck.clear();
+		deck = newDeck(deck);
 		for (String player : playerNames) {
-			createPlayer(player,cardsPerPlayer);
+			createPlayer(player);
 		}
 		whoseTurn = players.get(0);
 	}// end of GameMaster
 
-	private void createPlayer(String playerName,int cardsPerPlayer) {
-		players.add(new Player(playerName,deck.takeCardsFromDeck(cardsPerPlayer)));
+	private ArrayList<Card> newDeck(ArrayList<Card> deck) {
+
+		// suit
+		for (CardSuit suit : CardSuit.values()) {
+			for (CardValue value : CardValue.values()) {
+				deck.add(new Card(value, suit));
+			}
+		}
+		return shuffleDeck(deck);
+	}// end of newDeck
+
+	private ArrayList<Card> shuffleDeck(ArrayList<Card> deck) {
+		for (int i = 0; i < deck.size(); i++) {
+			Card tempCard = deck.remove(i);
+			deck.add((int) (Math.random()) * 52, tempCard);
+		}
+		return deck;
+	}// end of shuffleDeck
+
+	private void createPlayer(String playerName) {
+		players.add(new Player(playerName));
 	}// end of getPlayer
 
 	public int getNumberOfPlayers() {
@@ -33,12 +51,22 @@ public class GameMaster {
 		return whoseTurn;
 	}// end of getWhoseTurn
 
+<<<<<<< HEAD
 
 	public void handEmpty() {
 		if (getWhoseTurn().getHand().size() <= 0) {
 			getWhoseTurn().addToHand(deck.takeCardsFromDeck(5));
+=======
+	public static ArrayList<Card> takeCardsFromDeck(int amount) {
+		ArrayList<Card> cardsToRemove = new ArrayList<Card>();
+		for (int i = 0; i < amount || !deck.isEmpty(); i++) {
+			int cardToRemove = (int) (Math.random() * deck.size());
+			cardsToRemove.add(deck.get(cardToRemove));
+			deck.remove(cardToRemove);
+>>>>>>> parent of 7607345 (making Deck an class and adding logic for different player amounts)
 		}
-	}// end of handEmpty
+		return cardsToRemove;
+	}// end of takeFromCardsDeck
 
 	public String getPlayerNames() {
 		String playerNames = "";
@@ -75,7 +103,7 @@ public class GameMaster {
 			whoseTurn.calculateBooks();
 			return true;
 		} else {
-			ArrayList<Card> cardToAdd = deck.takeCardsFromDeck(1);
+			ArrayList<Card> cardToAdd = takeCardsFromDeck(1);
 			whoseTurn.addToHand(cardToAdd);
 			return valuePicked == cardToAdd.get(0).getValueInt();
 		}
@@ -131,7 +159,7 @@ public class GameMaster {
 		for (Player book : players) {
 			totalBooks += book.getNumberOfBooks();
 		}
-		if (deck.getDeckSize() == 0 && totalBooks == 13) {
+		if (deck.size() == 0 && totalBooks == 13) {
 			return true;
 		} else {
 			return false;
