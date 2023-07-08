@@ -7,15 +7,21 @@ public class GameMaster {
 	private ArrayList<Player> players = new ArrayList<Player>();
 	private Player whoseTurn;
 	private int whoseTurnNumber = 0;
+	private int cardsPerPlayer;
 
 	public GameMaster(String[] playerNames) {
-		int cardsPerPlayer;
-		cardsPerPlayer = (playerNames.length<4) ? 7:  5;
+		calculateCardsPerPlayer(playerNames);
+		
 		for (String player : playerNames) {
 			createPlayer(player,cardsPerPlayer);
 		}
 		whoseTurn = players.get(0);
 	}// end of GameMaster
+
+	private void calculateCardsPerPlayer(String[] playerNames) {
+		cardsPerPlayer = (playerNames.length<4) ? 7:  5; 
+		
+	}//end of calculateCardsPerPlayer
 
 	private void createPlayer(String playerName,int cardsPerPlayer) {
 		players.add(new Player(playerName,deck.takeCardsFromDeck(cardsPerPlayer)));
@@ -34,8 +40,10 @@ public class GameMaster {
 	}// end of getWhoseTurn
 
 	public void handEmpty() {
-		if (getWhoseTurn().getHand().size() <= 0) {
-			getWhoseTurn().addToHand(deck.takeCardsFromDeck(5));
+		for (Player player : players) {
+			if (player.getHand().size() <= 0) {
+				player.addToHand(deck.takeCardsFromDeck(5));
+			}
 		}
 	}// end of handEmpty
 

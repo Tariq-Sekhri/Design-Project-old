@@ -17,6 +17,7 @@ public class UserInterface {
             do {
                 String playerPick = playerPick(game);
                 String valuePick = valuePick(game).toUpperCase();
+                game.handEmpty();
                 boolean isCorrect = game.isPlayerGuessCorrect(playerPick, valuePick);
                 if (!isCorrect) {
                     System.out.println("You got it wrong! next player turn");
